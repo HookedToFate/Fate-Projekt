@@ -24,7 +24,16 @@
                 r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
                 return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
             };
-        }
+    
+  const SUIT_IMAGES = {
+  hearts: "Herz.png",
+  diamonds: "Karo.png",
+  clubs: "Kreuz.png",
+  spades: "Pik.png",
+  schelm: "Trickster.png",
+  stern: "Stern.png"
+};
+}
 
   function pick(arr, rnd, fallback) {
             if (!Array.isArray(arr) || arr.length === 0) return fallback;
@@ -545,7 +554,7 @@ const { createFateCore } = window.FortuneCore;
                                         {currentReading.glitch && glitchChain > 0 && (
                                             <div className="chain-chip">KETTE x{glitchChain}</div>
                                         )}
-                                        <div className="relative glitch-target text-8xl text-white mb-4 emoji-glow emoji-breathe mystic-bloom animate-scaleIn">{currentReading.symbol}</div>
+                                        <div className="relative glitch-target text-8xl text-white mb-4 emoji-glow emoji-breathe mystic-bloom animate-scaleIn"><img src={SUIT_IMAGES[currentReading.suit]} alt={currentReading.name} className="w-24 h-24 mx-auto" /></div>
                                         <h3 className="text-2xl font-bold text-white">{currentReading.archetype}</h3>
                                         <p className="text-white/90 font-medium">{currentReading.name} • {currentReading.element}</p>
                                     </div>
