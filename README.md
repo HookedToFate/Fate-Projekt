@@ -8,7 +8,6 @@ Karten Zieh Artefakt - Stand 21.10.2025
 
 Das Fate-Orakel ist eine mystische, interaktive Weissagungs-Anwendung, die an Tarot-Lesungen erinnert, aber ein eigenes Kartensystem verwendet. Die gesamte Ästhetik ist kosmisch-mystisch: dunkle Violett-, Indigo- und Pinktöne dominieren, als würde man in einen Sternenhimmel blicken. Der "Schleier" ist die zentrale Metapher – eine unsichtbare Grenze zwischen Wissen und Unwissen, die durch die Karten gelüftet wird.
 
----
 
 ## Visuelle Gestaltung und Atmosphäre
 
@@ -28,7 +27,7 @@ Der Hintergrund ist ein fließender Farbverlauf von tiefem Indigo über Violett 
   - Schelm-Karten verwenden Comic Sans – absichtlich verspielt und leicht chaotisch
   - Stern-Karten verwenden Playfair Display – philosophisch und würdevoll
 
----
+
 
 ## Haupttitel und Einführung
 
@@ -53,7 +52,7 @@ Darunter folgt eine Reihe von sechs großen Symbolen, die die sechs Kartenfarben
 
 Alle Symbole "atmen" – sie werden langsam größer und wieder kleiner in einem 2,6-Sekunden-Rhythmus, als hätten sie einen eigenen Herzschlag.
 
----
+
 
 ## Fragebereich und Interaktion
 
@@ -74,7 +73,7 @@ Rechts neben dem Fragefeld befindet sich ein Button für Hintergrundmusik:
 
 Wenn der Nutzer reduzierte Bewegung in seinen Systemeinstellungen aktiviert hat (Barrierefreiheit), erscheint ein kleiner Hinweistext, dass Animationen und Musik automatisch deaktiviert wurden.
 
----
+
 
 ## Karten-Ziehungs-Prozess
 
@@ -120,7 +119,6 @@ Auf der Karte:
 
 **Bonus-Karten** (Schelm und Stern) haben zusätzlich eine kleine "BONUS"-Plakette in der oberen rechten Ecke.
 
----
 
 ## Glitch-System (Instabilität)
 
@@ -194,7 +192,6 @@ Wenn der Nutzer "Schleier harmonisieren" klickt:
 - Die Seite kehrt zu ihrem ruhigen Ausgangszustand zurück
 - Für 0,9 Sekunden ist eine sanfte "Harmonisierungs-Aura" sichtbar
 
----
 
 ## Kosmische Ereignisse
 
@@ -233,7 +230,6 @@ Ein abgerundetes Rechteck mit:
 
 Das Event-Banner erscheint für 5,2 Sekunden über der Karte und verblasst dann.
 
----
 
 ## Die sechs Kartenfarben
 
@@ -290,8 +286,6 @@ Das Event-Banner erscheint für 5,2 Sekunden über der Karte und verblasst dann.
 - Beispiel-Fortune: "Erkenne dich selbst." – Sokrates
 - Vibe: Ruhig, weise, tiefgründig
 - Besonderheit: Verwendet Playfair Display Schrift, Fortunes sind echte philosophische Zitate
-
----
 
 ## Interpretations-Anzeige
 
@@ -356,7 +350,7 @@ Beispiel:
 
 Die Insight erscheint in einer dunklen Box mit gelbem Akzent und dem Label "Antwort:".
 
----
+
 
 ## Letzte Deutungen (Historie)
 
@@ -370,7 +364,7 @@ Hier werden die letzten 5 gezogenen Karten als kleine Vorschau angezeigt:
 - Mit jeder Position wird die Karte transparenter (neueste: 100%, zweitneuste: 90%, drittneuste: 75%, etc.)
 - Wenn man mit der Maus über eine alte Karte fährt, erscheint ein Tooltip mit der Frage (falls vorhanden)
 
----
+
 
 ## Farb-Beschreibungen (Unten auf der Seite)
 
