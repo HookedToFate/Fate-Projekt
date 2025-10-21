@@ -333,6 +333,7 @@ const { createFateCore } = window.FortuneCore;
             const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
             const [fireworkVisible, setFireworkVisible] = useState(false);
             const [fortuneKey, setFortuneKey] = useState(0);
+            const [imageError, setImageError] = useState(false);
             const audioRef = useRef(null);
             const fireworkTimeoutRef = useRef(null);
 
@@ -385,6 +386,7 @@ const { createFateCore } = window.FortuneCore;
                 setCurrentReading(null);
                 setShowInterpretation(false);
                 setIsDrawing(true);
+                setImageError(false);
 
                 const trimmedQuestion = question.trim();
                 const draftReading = core.draw({ bonusChance: 0.10, boostActive: glitchBoostLeft > 0, glitchChain });
@@ -545,18 +547,36 @@ const { createFateCore } = window.FortuneCore;
                                         </div>
                                     )}
                                     <div
-                                        className={`inline-block p-8 bg-gradient-to-br ${getSuitMeta(currentReading.suit).gradient} mystic-ripple mystic-sweep card-reel ${buildGlitchClass(currentReading)} animate-cardFromDeck rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-4 border-white/30 mb-6 ${
+                                        className={`card-holder card-reel ${buildGlitchClass(currentReading)} animate-cardFromDeck ${
                                             SUIT_FONT_CLASS[currentReading.suit] || ''
                                         }`}
                                         style={{ '--card-color-flash': getSuitMeta(currentReading.suit).flash }}
+                                        data-suit={currentReading.suit}
                                     >
                                         {currentReading.glitch && glitchChain > 0 && (
                                             <div className="chain-chip">KETTE x{glitchChain}</div>
                                         )}
-                                        <div className="relative glitch-target text-8xl text-white mb-4 emoji-glow emoji-breathe mystic-bloom animate-scaleIn"><img src={SUIT_IMAGES[currentReading.suit]} alt={currentReading.name} className="w-24 h-24 mx-auto" /></div>
-                                        <h3 className="text-2xl font-bold text-white">{currentReading.archetype}</h3>
-                                        <p className="text-white/90 font-medium">{currentReading.name} • {currentReading.element}</p>
+                                        {SUIT_IMAGES[currentReading.suit] && !imageError ? (
+                                            <img
+                                                src={SUIT_IMAGES[currentReading.suit]}
+                                                alt={currentReading.name}
+                                                className="card-face-img"
+                                                decoding="async"
+                                                fetchpriority="high"
+                                                onError={() => setImageError(true)}
+                                            />
+                                        ) : (
+                                            <div className="card-face-fallback">
+                                                <span className="fallback-symbol">{currentReading.symbol || '?'}</span>
+                                            </div>
+                                        )}
+                                        {(currentReading.suit === 'schelm' || currentReading.suit === 'stern') && <BonusBadge />}
+                                        <div className="foil-shine" aria-hidden="true"></div>
+                                        <div className="edge-highlight" aria-hidden="true"></div>
+                                        <div className="inner-shadow" aria-hidden="true"></div>
                                     </div>
+                                    <h3 className="text-2xl font-bold text-white mt-4">{currentReading.archetype}</h3>
+                                    <p className="text-white/90 font-medium">{currentReading.name} • {currentReading.element}</p>
                                     {glitchChain > 0 && <ChainMeter value={glitchChain} />}
                                     {showInterpretation && (
                                         <div className={currentReading.glitch ? 'interpretation-glitch' : 'animate-fadeIn'}>
@@ -635,11 +655,17 @@ const { createFateCore } = window.FortuneCore;
                                     {drawnCards.map((card, index) => (
                                         <div
                                             key={`${card.timestamp}-${card.suit}-${index}`}
-                                            className={`text-center p-4 rounded-xl bg-gradient-to-br ${getSuitMeta(card.suit).gradient} ${RECENT_CARD_OPACITY[index] || 'opacity-40'}`}
+                                            className={`recent-card ${RECENT_CARD_OPACITY[index] || 'opacity-40'}`}
                                             title={card.question ? `Frage: ${card.question}` : undefined}
                                         >
-                                            <div className="text-3xl text-white mb-2 emoji-glow emoji-breathe">{card.symbol}</div>
-                                            <p className="text-xs text-white/90">{card.timestamp}</p>
+                                            {SUIT_IMAGES[card.suit] ? (
+                                                <img className="recent-card-img" src={SUIT_IMAGES[card.suit]} alt={card.name} loading="lazy" />
+                                            ) : (
+                                                <div className={`recent-card-fallback`}> 
+                                                    <span className="fallback-symbol">{card.symbol}</span>
+                                                </div>
+                                            )}
+                                            <p className="recent-card-time">{card.timestamp}</p>
                                         </div>
                                     ))}
                                 </div>
