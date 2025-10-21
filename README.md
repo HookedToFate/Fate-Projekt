@@ -1,7 +1,6 @@
 # Fate-Orakel
------
 Karten Zieh Artefakt - Stand 21.10.2025
-----
+
 # Vollständige Beschreibung des Fate-Orakels 
 
 ## Grundkonzept und Thema
