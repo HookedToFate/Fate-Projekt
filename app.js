@@ -24,15 +24,6 @@
                 r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
                 return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
             };
-    
-  const SUIT_IMAGES = {
-  hearts: "Herz.png",
-  diamonds: "Karo.png",
-  clubs: "Kreuz.png",
-  spades: "Pik.png",
-  schelm: "Trickster.png",
-  stern: "Stern.png"
-};
 }
 
   function pick(arr, rnd, fallback) {
@@ -196,6 +187,14 @@ const { createFateCore } = window.FortuneCore;
         const getSuitMeta = (suit) => SUIT_META[suit] ?? { gradient: 'from-purple-400 to-indigo-500', flash: '#ffffff' };
         const SUIT_FONT_CLASS = { schelm: 'font-schelm', stern: 'font-stern' };
         const TITLE_COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+        const SUIT_IMAGES = {
+            hearts: 'Herz.png',
+            diamonds: 'Karo.png',
+            clubs: 'Kreuz.png',
+            spades: 'Pik.png',
+            schelm: 'Trickster.png',
+            stern: 'Stern.png',
+        };
         const SUIT_MUSIC = {
             hearts: 'https://cdn.pixabay.com/download/audio/2022/03/02/audio_8c82112f2b.mp3?filename=soft-ambient-11119.mp3',
             diamonds: 'https://cdn.pixabay.com/download/audio/2022/10/22/audio_1c9c886e60.mp3?filename=ethereal-chime-124069.mp3',
