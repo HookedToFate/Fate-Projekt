@@ -327,6 +327,8 @@ const { createFateCore } = window.FortuneCore;
             const [fortuneKey, setFortuneKey] = useState(0);
             const audioRef = useRef(null);
             const fireworkTimeoutRef = useRef(null);
+            const drawTimeoutRef = useRef(null);
+            const showInterpretationTimeoutRef = useRef(null);
 
             const core = useMemo(() => createFateCore(SUIT_REGISTRY), []);
 
@@ -366,10 +368,29 @@ const { createFateCore } = window.FortuneCore;
                 audio.play().catch(() => {});
             }, [musicEnabled, activeTrack, prefersReducedMotion]);
 
-            useEffect(() => () => {
-                if (fireworkTimeoutRef.current) {
-                    clearTimeout(fireworkTimeoutRef.current);
-                }
+            useEffect(() => {
+                return () => {
+                    if (fireworkTimeoutRef.current) {
+                        clearTimeout(fireworkTimeoutRef.current);
+                        fireworkTimeoutRef.current = null;
+                    }
+                    if (drawTimeoutRef.current) {
+                        clearTimeout(drawTimeoutRef.current);
+                        drawTimeoutRef.current = null;
+                    }
+                    if (showInterpretationTimeoutRef.current) {
+                        clearTimeout(showInterpretationTimeoutRef.current);
+                        showInterpretationTimeoutRef.current = null;
+                    }
+                    if (audioRef.current) {
+                        try {
+                            audioRef.current.pause();
+                            audioRef.current.src = '';
+                        } catch (e) {
+                            // ignore
+                        }
+                    }
+                };
             }, []);
 
             const drawFateCard = () => {
@@ -383,7 +404,8 @@ const { createFateCore } = window.FortuneCore;
                 setPreGlitch(Boolean(draftReading.glitch));
                 const readingWithQuestion = { ...draftReading, question: trimmedQuestion || null };
 
-                setTimeout(() => {
+                // schedule the reveal; keep the timeout id in a ref so we can clear it on unmount
+                drawTimeoutRef.current = setTimeout(() => {
                     try {
                         const reading = readingWithQuestion;
                         let nextBoost = glitchBoostLeft;
@@ -423,7 +445,8 @@ const { createFateCore } = window.FortuneCore;
                     } finally {
                         setIsDrawing(false);
                         setPreGlitch(false);
-                        setTimeout(() => setShowInterpretation(true), 500);
+                        // schedule interpretation display and store id so we can clear it if needed
+                        showInterpretationTimeoutRef.current = setTimeout(() => setShowInterpretation(true), 500);
                     }
                 }, 1200);
             };
@@ -644,5 +667,20 @@ const { createFateCore } = window.FortuneCore;
             );
         };
 
-        ReactDOM.render(<FateOracle />, document.getElementById('root'));
+        // Mount the app: use React 18+ createRoot when available, otherwise fall back to ReactDOM.render
+        (function mountApp() {
+            const rootEl = document.getElementById('root');
+            if (!rootEl) return;
+            if (ReactDOM.createRoot) {
+                // React 18+ concurrent root
+                ReactDOM.createRoot(rootEl).render(<FateOracle />);
+            } else {
+                // React 17 and earlier
+                ReactDOM.render(<FateOracle />, rootEl);
+            }
+        })();
+
+    // Cleanup on unmount: clear any pending timeouts and pause audio to avoid state updates after component is unmounted
+    // We attach this to a top-level effect within the component by creating one more useEffect.
+    // Note: this effect is added outside the component return but inside the module scope; move inside component if strict scoping needed.
     
