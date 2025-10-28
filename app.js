@@ -366,7 +366,7 @@ const { createFateCore } = window.FortuneCore;
         );
 
         const GlitchBadge = () => (
-            <div className="absolute top-2 left-2 text-[10px] px-2 py-1 rounded-md bg-red-500/90 text-white font-extrabold shadow-md border border-white/30" aria-label="Glitch-Modus">GLITCH</div>
+            <div data-testid="glitch" className="absolute top-2 left-2 text-[10px] px-2 py-1 rounded-md bg-red-500/90 text-white font-extrabold shadow-md border border-white/30" aria-label="Glitch-Modus">GLITCH</div>
         );
 
         const GlitchProgress = ({ value, max = 8 }) => {
@@ -438,8 +438,13 @@ const { createFateCore } = window.FortuneCore;
             const [fireworkVisible, setFireworkVisible] = useState(false);
             const [fortuneKey, setFortuneKey] = useState(0);
             const [imageError, setImageError] = useState(false);
+            const urlSeedRef = useRef((() => {
+                try { return new URLSearchParams(window.location.search).get('seed'); } catch { return null; }
+            })());
             const audioRef = useRef(null);
             const fireworkTimeoutRef = useRef(null);
+            const drawTimeoutRef = useRef(null);
+            const showInterpretationTimeoutRef = useRef(null);
 
             const core = useMemo(() => createFateCore(SUIT_REGISTRY), []);
 
@@ -618,7 +623,7 @@ const { createFateCore } = window.FortuneCore;
                 setImageError(false);
 
                 const trimmedQuestion = question.trim();
-                const draftReading = core.draw({ bonusChance: 0.10, boostActive: glitchBoostLeft > 0, glitchChain });
+                const draftReading = core.draw({ seed: urlSeedRef.current || undefined, bonusChance: 0.10, boostActive: glitchBoostLeft > 0, glitchChain });
                 setPreGlitch(Boolean(draftReading.glitch));
                 const readingWithQuestion = { ...draftReading, question: trimmedQuestion || null };
 
@@ -748,7 +753,7 @@ const { createFateCore } = window.FortuneCore;
                                     </div>
                                     <h2 className="text-2xl font-semibold text-white mb-4">Der Schleier erwartet deine Frage</h2>
                                     <p className="text-purple-200 mb-6">Konzentriere dich auf deine Frage und ziehe dann eine Karte, um dein Schicksal zu enthüllen.</p>
-                                    <button onClick={drawFateCard} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    <button data-testid="draw-btn" onClick={drawFateCard} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                                         <Shuffle className="inline-block w-5 h-5 mr-2" />
                                         Ziehe dein Schicksal
                                     </button>
@@ -758,7 +763,7 @@ const { createFateCore } = window.FortuneCore;
                             {isDrawing && (
                                 <div className="text-center">
                                     <div className={`w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center animate-pulse relative ${preGlitch ? 'pre-glitch' : ''}`}>
-                                        <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mystic-focus" role="status" aria-live="polite" aria-busy={true}></div>
+                                        <div data-testid="loader" className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mystic-focus" role="status" aria-live="polite" aria-busy={true}></div>
                                         {preGlitch && <div className="draw-glitch-layer" aria-hidden="true"></div>}
                                     </div>
                                     <h2 className="text-2xl font-semibold text-white mb-4">Die Schicksalsgöttinnen entscheiden...</h2>
@@ -778,6 +783,7 @@ const { createFateCore } = window.FortuneCore;
                                         </div>
                                     )}
                                     <div
+                                        data-testid="card-face"
                                         className={`card-holder card-reel ${buildGlitchClass(currentReading)} animate-cardFromDeck ${
                                             SUIT_FONT_CLASS[currentReading.suit] || ''
                                         } cursor-pointer`}
@@ -798,6 +804,7 @@ const { createFateCore } = window.FortuneCore;
                                         {currentReading.glitch && <GlitchBadge />}
                                         {SUIT_IMAGES[currentReading.suit] && !imageError ? (
                                             <img
+                                                data-testid="suit-img"
                                                 src={SUIT_IMAGES[currentReading.suit]}
                                                 alt={currentReading.name}
                                                 className="card-face-img"
@@ -835,6 +842,7 @@ const { createFateCore } = window.FortuneCore;
                                                 )}
                                                 <p className={`text-xl text-purple-100 leading-relaxed mb-4 ${SUIT_FONT_CLASS[currentReading.suit] || ''}`}>
                                                     <span
+                                                        data-testid="quote"
                                                         key={fortuneKey}
                                                         className={`fortune-type ${currentReading.glitch ? 'glitchy' : ''}`}
                                                         style={{ '--fortune-steps': Math.max(20, Math.min(70, currentReading.fortune.length)) }}
@@ -850,7 +858,7 @@ const { createFateCore } = window.FortuneCore;
                                                 </div>
                                             </div>
 
-                                            <button onClick={drawFateCard} className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300">
+                                            <button data-testid="draw-btn" onClick={drawFateCard} className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300">
                                                 <Shuffle className="inline-block w-4 h-4 mr-2" />
                                                 Erneut ziehen
                                             </button>
