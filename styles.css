@@ -282,7 +282,7 @@
         .draw-field::after { content: ""; position: absolute; inset: -6vh -6vw; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.32) 100%); opacity: 0; animation: screenVignette var(--dur-m, .8s) ease-out .15s both; }
         @keyframes screenVignette { 0% { opacity: 0; } 40% { opacity: .18; } 100% { opacity: 0; } }
 
-        .shockwave-layer { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 260px; height: 260px; border-radius: 9999px; border: 2px solid var(--card-color-flash, #ffffff); opacity: 0; pointer-events: none; z-index: 0; }
+        .shockwave-layer { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: clamp(180px, 30vw, 280px); height: clamp(180px, 30vw, 280px); border-radius: 9999px; border: 2px solid var(--card-color-flash, #ffffff); opacity: 0; pointer-events: none; z-index: 0; }
         .shockwave-layer::before, .shockwave-layer::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
         .shockwave-layer::before { border: 2px solid var(--card-color-flash, #fff); opacity: 0; }
         .shockwave-layer::after { inset: -10px; box-shadow: 0 0 40px var(--card-color-flash, #fff), 0 0 80px rgba(255,255,255,.25) inset; opacity: 0; }
@@ -419,14 +419,61 @@
 
 
         /* ---- Full-card image face & overlays ---- */
-        .card-holder { position: relative; display: inline-block; width: clamp(240px, 60vw, 420px); aspect-ratio: 63/88; border-radius: 20px; overflow: hidden; border: 4px solid rgba(255,255,255,.30); box-shadow: 0 24px 60px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.25); background: radial-gradient(60% 60% at 50% 35%, rgba(255,255,255,.08), rgba(255,255,255,0) 60%); }
-        .card-face-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; border-radius: inherit; }
+        /* Card face tuned to real 63x88 aspect, radius ≈5.5% */
+        .card-holder { --card-radius: 5.5%; position: relative; display: inline-block; width: clamp(170px, 24vw, 260px); aspect-ratio: 63/88; border-radius: var(--card-radius); overflow: hidden; border: 3px solid rgba(255,255,255,.30); box-shadow: 0 28px 70px rgba(0,0,0,.40), 0 10px 28px rgba(0,0,0,.30); background: radial-gradient(60% 60% at 50% 35%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%); filter: drop-shadow(0 0 18px color-mix(in srgb, var(--card-color-flash, #fff) 55%, transparent)) drop-shadow(0 0 40px color-mix(in srgb, var(--card-color-flash, #fff) 40%, transparent)); }
+        .card-face-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: 50% 50%; display: block; border-radius: var(--card-radius); transform: scale(var(--card-zoom, 1.048)); transform-origin: 50% 50%; }
         .card-face-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: inherit; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)); color: #fff; }
         .card-face-fallback .fallback-symbol { font-size: clamp(48px, 12vw, 96px); text-shadow: 0 2px 10px rgba(0,0,0,.4); filter: drop-shadow(0 0 10px rgba(255,255,255,.25)); }
-        .foil-shine { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(115deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.45) 50%, rgba(255,255,255,0) 60%), radial-gradient(closest-side, color-mix(in srgb, var(--card-color-flash, #fff) 35%, transparent) 0%, rgba(255,255,255,0) 60%); background-repeat: no-repeat; background-size: 220% 100%, 100% 100%; background-position: -140% 0, 50% 50%; animation: foilSweep 2.4s ease-out .3s both; mix-blend-mode: screen; opacity: .32; }
+        .foil-shine { position: absolute; inset: 0; pointer-events: none; border-radius: var(--card-radius); background: linear-gradient(115deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 60%), radial-gradient(closest-side, color-mix(in srgb, var(--card-color-flash, #fff) 45%, transparent) 0%, rgba(255,255,255,0) 60%); background-repeat: no-repeat; background-size: 220% 100%, 100% 100%; background-position: -140% 0, 50% 50%; animation: foilSweep 2.8s ease-out .2s both; mix-blend-mode: screen; opacity: .36; }
         @keyframes foilSweep { 0% { background-position: -160% 0, 50% 50%; opacity: .18; } 100% { background-position: 160% 0, 50% 50%; opacity: .32; } }
-        .edge-highlight { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45), inset 0 0 0 6px rgba(255,255,255,.08); }
-        .inner-shadow { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 24px 56px rgba(0,0,0,.35), inset 0 -18px 32px rgba(0,0,0,.25); }
+        .edge-highlight { position: absolute; inset: 0; border-radius: var(--card-radius); pointer-events: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.55), inset 0 0 0 6px rgba(255,255,255,.10); }
+        .inner-shadow { position: absolute; inset: 0; border-radius: var(--card-radius); pointer-events: none; box-shadow: inset 0 24px 56px rgba(0,0,0,.42), inset 0 -18px 32px rgba(0,0,0,.28); }
+
+        /* magical border rings aligned to radius */
+        .card-holder::before, .card-holder::after { content: ""; position: absolute; inset: -2px; border-radius: var(--card-radius); pointer-events: none; }
+        .card-holder::before { box-shadow: 0 0 0 2px color-mix(in srgb, var(--card-color-flash,#fff) 70%, transparent), 0 0 30px color-mix(in srgb, var(--card-color-flash,#fff) 40%, transparent), 0 0 60px color-mix(in srgb, var(--card-color-flash,#fff) 28%, transparent); opacity: .9; }
+        .card-holder::after { inset: -6px; border-radius: var(--card-radius); box-shadow: 0 0 0 1px rgba(255,255,255,.35), 0 0 24px rgba(255,255,255,.18) inset; mix-blend-mode: screen; opacity: .7; }
+
+        /* Glitch overlay host */
+        .glitch-overlay { position: absolute; inset: 0; border-radius: var(--card-radius); pointer-events: none; }
+        .card-holder[data-glitch-level="0"] .glitch-overlay { display: none; }
+        /* Level 1: soft scanlines + micro RGB fringe */
+        .card-holder[data-glitch-level="1"] { filter: drop-shadow(1px 0 rgba(255,0,0,.35)) drop-shadow(-1px 0 rgba(0,255,255,.35)) drop-shadow(0 0 16px color-mix(in srgb, var(--card-color-flash,#fff) 40%, transparent)); }
+        .card-holder[data-glitch-level="1"] .glitch-overlay { background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, rgba(255,255,255,0) 1px 3px); opacity: .25; mix-blend-mode: screen; animation: gScan 1.2s linear infinite; }
+        @keyframes gScan { 0% { background-position: 0 0; } 100% { background-position: 0 6px; } }
+        @keyframes gStutter { 0% { transform: none; } 50% { transform: translateX(3px); } 100% { transform: none; } }
+        /* Level 2: stutter + shears */
+        .card-holder[data-glitch-level="2"] { animation: gStutter 220ms steps(2,end) 1; }
+        .card-holder[data-glitch-level="2"] .glitch-overlay { background:
+            linear-gradient(0deg, transparent 0%, transparent 18%, rgba(255,255,255,.10) 18% 28%, transparent 28% 100%),
+            repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, transparent 2px 4px);
+            mix-blend-mode: screen; opacity: .32; animation: shearShift 220ms steps(2,end) 1; }
+        @keyframes shearShift { 0% { transform: none; } 50% { transform: translateX(4px); } 100% { transform: none; } }
+        /* Level 3: parallax slices + lens pulse */
+        .card-holder[data-glitch-level="3"] { filter: saturate(1.15) contrast(1.05) drop-shadow(2px 0 rgba(255,0,0,.40)) drop-shadow(-2px 0 rgba(0,255,255,.40)); }
+        .card-holder[data-glitch-level="3"] .glitch-overlay { background:
+            linear-gradient(0deg, rgba(255,255,255,.10) 0 8%, transparent 8% 40%, rgba(255,255,255,.10) 40% 48%, transparent 48% 78%, rgba(255,255,255,.08) 78% 86%, transparent 86% 100%),
+            radial-gradient(600px 240px at 50% 45%, rgba(255,255,255,.12), rgba(255,255,255,0) 60%);
+            background-size: 100% 100%, 140% 100%; background-position: 0 0, 50% 50%; mix-blend-mode: screen; opacity: .34; animation: parallaxSlices 420ms ease-out 1; }
+        @keyframes parallaxSlices { 0% { background-position: 0 0, 48% 50%; } 50% { background-position: -6px 0, 52% 52%; } 100% { background-position: 0 0, 50% 50%; } }
+
+        /* Level 5: frame break shards + border desync */
+        .card-holder[data-glitch-level="5"] { animation: frameTilt 420ms cubic-bezier(.2,.9,.2,1) 1; box-shadow: 0 32px 90px rgba(0,0,0,.50), 0 0 36px color-mix(in srgb, var(--card-color-flash,#fff) 55%, transparent); }
+        .card-holder[data-glitch-level="5"] .glitch-overlay::before,
+        .card-holder[data-glitch-level="5"] .glitch-overlay::after { content: ""; position: absolute; inset: -6%; border-radius: inherit; mix-blend-mode: screen; opacity: .55; }
+        .card-holder[data-glitch-level="5"] .glitch-overlay::before { background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,0)); clip-path: polygon(0% 10%, 60% 0%, 38% 30%); animation: shardOutA 280ms ease-out 1; }
+        .card-holder[data-glitch-level="5"] .glitch-overlay::after { background: linear-gradient(90deg, rgba(255,255,255,.25), rgba(255,255,255,0)); clip-path: polygon(100% 90%, 40% 100%, 62% 70%); animation: shardOutB 280ms ease-out 1; }
+        @keyframes frameTilt { 0% { transform: rotate(0deg) translateZ(0); } 30% { transform: rotate(.6deg) translate(1px,-1px); } 100% { transform: rotate(0deg) translateZ(0); } }
+        @keyframes shardOutA { 0% { transform: translate(-4px,-3px); opacity: .0; } 60% { transform: translate(-10px,-7px); opacity: .7; } 100% { transform: translate(0,0); opacity: .0; } }
+        @keyframes shardOutB { 0% { transform: translate(4px,3px); opacity: .0; } 60% { transform: translate(10px,7px); opacity: .6; } 100% { transform: translate(0,0); opacity: .0; } }
+
+        /* Level 6: cosmic interference (lens ripple + saturation) */
+        .card-holder[data-glitch-level="6"] { filter: saturate(1.28) contrast(1.12) drop-shadow(0 0 22px color-mix(in srgb, var(--card-color-flash,#fff) 60%, transparent)); }
+        .card-holder[data-glitch-level="6"] .glitch-overlay { background:
+            radial-gradient(120% 80% at 50% 50%, rgba(255,255,255,.16), rgba(255,255,255,0) 60%),
+            repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, rgba(255,255,255,0) 2px 5px);
+            mix-blend-mode: screen; opacity: .36; animation: lensRipple 800ms ease-out 1; }
+        @keyframes lensRipple { 0% { transform: scale(1); opacity: .18; } 50% { transform: scale(1.04); opacity: .42; } 100% { transform: scale(1); opacity: .28; } }
 
         /* ---- Recent cards thumbnails ---- */
         .recent-card { position: relative; width: 100%; aspect-ratio: 63/88; border-radius: 12px; overflow: hidden; border: 2px solid rgba(255,255,255,.22); background: rgba(255,255,255,.06); box-shadow: 0 10px 20px rgba(0,0,0,.15); }
@@ -435,6 +482,14 @@
         .recent-card-time { position: absolute; bottom: 6px; left: 6px; right: 6px; text-align: center; font-size: 10px; color: rgba(255,255,255,.9); text-shadow: 0 1px 2px rgba(0,0,0,.6); background: rgba(0,0,0,.18); border-radius: 6px; padding: 2px 6px; }
 
         @media (prefers-reduced-motion: reduce) { .foil-shine { animation: none !important; } }
+
+        /* Glitch canvas overlay */
+        .glitch-canvas { position: absolute; inset: 0; border-radius: var(--card-radius); pointer-events: none; mix-blend-mode: screen; }
+
+        /* Glitch progress bar */
+        .glitch-progress { display: flex; gap: 6px; justify-content: center; align-items: center; margin: 10px auto 0; padding: 4px 6px; border-radius: 9999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); width: max-content; }
+        .glitch-progress .seg { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.18); box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset; transition: transform .25s ease, background-color .25s ease, box-shadow .25s ease; }
+        .glitch-progress .seg.on { background: color-mix(in srgb, var(--card-color-flash, #fff) 60%, white); box-shadow: 0 0 8px color-mix(in srgb, var(--card-color-flash, #fff) 60%, transparent), 0 0 0 1px rgba(255,255,255,.35) inset; transform: scale(1.1); }
 
 /* Hidden baseline canvas for future FX; does not alter current visuals */
 #veil-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;}

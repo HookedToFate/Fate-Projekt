@@ -113,18 +113,107 @@ function createFateCore(registry, opts = {}) {
 // ...existing code...
 
 
-// VisualFX scaffold (no-op baseline to preserve current visuals)
+// VisualFX: ambient canvas with twinkles + rings and simple particles
 ;(function(){
+  let ctx = null, canvas = null, raf = null, dpr = 1;
+  let color = '#ffffff';
+  const stars = [];
+  let pulse = 0, pulseV = 0; // ring pulse
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
   function initFX(canvasId){
-    var c = document.getElementById(canvasId);
-    if(!c) return;
-    function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+    canvas = document.getElementById(canvasId);
+    if(!canvas) return;
+    ctx = canvas.getContext('2d');
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    function resize(){
+      dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+    }
     resize();
     window.addEventListener('resize', resize);
-    // No drawing yet to keep visuals identical
+
+    // seed twinkles
+    stars.length = 0;
+    for(let i=0;i<60;i++){
+      stars.push({
+        x: Math.random(), y: Math.random(), r: Math.random()*1.2+0.2, sp: Math.random()*0.6+0.2,
+      });
+    }
+
+    function loop(t){
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0,0,W,H);
+
+      // nebula tint
+      const g = ctx.createRadialGradient(W*0.5, H*0.35, 0, W*0.5, H*0.5, Math.max(W,H)*0.7);
+      g.addColorStop(0, hexToRgba(color, 0.08));
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+      // twinkles
+      ctx.globalCompositeOperation = 'lighter';
+      for(const s of stars){
+        const a = (Math.sin(t*s.sp/800)+1)/2; // 0..1
+        ctx.fillStyle = hexToRgba(color, 0.12 + a*0.22);
+        const x = s.x*W, y = s.y*H; const rr = (s.r + a*0.8)*dpr;
+        ctx.beginPath(); ctx.arc(x,y,rr,0,Math.PI*2); ctx.fill();
+      }
+
+      // pulse rings
+      if(pulse > 0.001 && !media.matches){
+        pulse += pulseV; pulseV *= 0.985; pulse *= 0.985;
+        const cx = W*0.5, cy = H*0.5;
+        for(let i=0;i<3;i++){
+          ctx.strokeStyle = hexToRgba(color, 0.25 * Math.max(0, (pulse - i*0.15)));
+          ctx.lineWidth = Math.max(1, 2*dpr);
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(W,H)*0.12 + (pulse-i*0.15)*Math.max(W,H)*0.25, 0, Math.PI*2);
+          ctx.stroke();
+        }
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
+      raf = requestAnimationFrame(loop);
+    }
+    if(raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
   }
-  function updateAmbient(suit){ /* no-op baseline */ }
-  function shootParticles(x, y, opts){ /* no-op baseline */ }
+
+  function updateAmbient(suit, opts={}){
+    const palette = {
+      hearts: '#ef4444', diamonds: '#3b82f6', clubs: '#10b981', spades: '#374151', schelm: '#f59e0b', stern: '#8b5cf6', default: '#ffffff'
+    };
+    color = palette[suit] || palette.default;
+    const strength = Math.max(0, Math.min(1, opts.intensity ?? 0.6));
+    pulse = Math.max(pulse, 0.5*strength);
+    pulseV = Math.max(pulseV, 0.08*strength);
+  }
+
+  function shootParticles(x, y, opts={}){
+    // lightweight radial burst at viewport coords
+    if(!ctx || !canvas) return;
+    const W = canvas.width, H = canvas.height;
+    const dprLocal = Math.max(1, window.devicePixelRatio||1);
+    const px = x*dprLocal, py = y*dprLocal;
+    const col = opts.color || color;
+    for(let i=0;i<14;i++){
+      const ang = Math.random()*Math.PI*2; const r = Math.random()*30*dprLocal;
+      ctx.fillStyle = hexToRgba(col, 0.35);
+      ctx.beginPath(); ctx.arc(px+Math.cos(ang)*r, py+Math.sin(ang)*r, Math.random()*2+0.5, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  function hexToRgba(hex, a){
+    const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
+    if(!m) return `rgba(255,255,255,${a||1})`;
+    return `rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a||1})`;
+  }
+
   window.VisualFX = { initFX, updateAmbient, shootParticles };
 })();
 
@@ -273,8 +362,23 @@ const { createFateCore } = window.FortuneCore;
 
 
         const BonusBadge = () => (
-            <div className="absolute -top-3 right-3 text-[10px] px-2 py-1 rounded-full bg-white/80 text-black font-semibold" aria-label="Bonus-Farbe">BONUS</div>
+            <div className="absolute top-2 right-2 text-[10px] px-2 py-1 rounded-md bg-white/90 text-black font-bold shadow-md border border-white/60" aria-label="Bonus-Farbe">BONUS</div>
         );
+
+        const GlitchBadge = () => (
+            <div className="absolute top-2 left-2 text-[10px] px-2 py-1 rounded-md bg-red-500/90 text-white font-extrabold shadow-md border border-white/30" aria-label="Glitch-Modus">GLITCH</div>
+        );
+
+        const GlitchProgress = ({ value, max = 8 }) => {
+            const clamped = Math.max(0, Math.min(max, value));
+            return (
+                <div className="glitch-progress" role="status" aria-label={`Glitch-Fortschritt ${clamped}/${max}`}>
+                    {Array.from({ length: max }).map((_, i) => (
+                        <span key={i} className={`seg ${i < clamped ? 'on' : ''}`}></span>
+                    ))}
+                </div>
+            );
+        };
 
         const ChainMeter = ({ value }) => {
             const maxNodes = 5;
@@ -336,6 +440,8 @@ const { createFateCore } = window.FortuneCore;
             const [imageError, setImageError] = useState(false);
             const audioRef = useRef(null);
             const fireworkTimeoutRef = useRef(null);
+            const glitchCanvasRef = useRef(null);
+            const glitchAnimRef = useRef(null);
 
             const core = useMemo(() => createFateCore(SUIT_REGISTRY), []);
 
@@ -380,6 +486,112 @@ const { createFateCore } = window.FortuneCore;
                     clearTimeout(fireworkTimeoutRef.current);
                 }
             }, []);
+
+            // Init ambient background FX once
+            useEffect(() => {
+                try { window.VisualFX && window.VisualFX.initFX && window.VisualFX.initFX('veil-bg'); } catch {}
+            }, []);
+
+            // Pulse ambient FX when a reading arrives (stronger on higher glitch levels)
+            useEffect(() => {
+                if (!currentReading) return;
+                try {
+                    const suit = currentReading.suit;
+                    const strong = currentReading.glitch ? Math.min(1, (glitchChain || 1) / 6) : 0.4;
+                    window.VisualFX && window.VisualFX.updateAmbient && window.VisualFX.updateAmbient(suit, { intensity: strong });
+                } catch {}
+            }, [currentReading, glitchChain]);
+
+            // Level 4 canvas overlay: echo phantoms orbiting around the card
+            useEffect(() => {
+                const canvas = glitchCanvasRef.current;
+                const holder = canvas?.parentElement;
+                if (!canvas || !holder) return;
+                const level = currentReading?.glitch ? Math.min(6, Math.max(1, glitchChain || 1)) : 0;
+
+                // Resize canvas to match holder's CSS pixels
+                const resize = () => {
+                    const rect = holder.getBoundingClientRect();
+                    const dpr = Math.max(1, window.devicePixelRatio || 1);
+                    canvas.width = Math.floor(rect.width * dpr);
+                    canvas.height = Math.floor(rect.height * dpr);
+                    canvas.style.width = rect.width + 'px';
+                    canvas.style.height = rect.height + 'px';
+                };
+                resize();
+
+                let raf = null;
+                const ctx = canvas.getContext('2d');
+                const color = getSuitMeta(currentReading?.suit || 'hearts').flash;
+                let t0 = performance.now();
+
+                function roundRectPath(ctx, x, y, w, h, r){
+                    const rr = Math.min(r, Math.min(w, h) / 2);
+                    ctx.beginPath();
+                    ctx.moveTo(x + rr, y);
+                    ctx.arcTo(x + w, y, x + w, y + h, rr);
+                    ctx.arcTo(x + w, y + h, x, y + h, rr);
+                    ctx.arcTo(x, y + h, x, y, rr);
+                    ctx.arcTo(x, y, x + w, y, rr);
+                    ctx.closePath();
+                }
+
+                const animate = (now) => {
+                    const dt = (now - t0) / 1000;
+                    t0 = now;
+                    const dpr = Math.max(1, window.devicePixelRatio || 1);
+                    const W = canvas.width;
+                    const H = canvas.height;
+                    ctx.clearRect(0, 0, W, H);
+
+                    if (prefersReducedMotion || level < 4) return; // draw nothing for low level
+
+                    // Echos orbit around the center
+                    const cx = W/2, cy = H/2;
+                    const baseW = W * 0.86;
+                    const baseH = H * 0.86;
+                    const radius = Math.min(baseW, baseH) * 0.055;
+                    const ghosts = 3;
+                    for (let i=0;i<ghosts;i++){
+                        const ang = (now/900 + i * (Math.PI*2/ghosts));
+                        const dx = Math.cos(ang) * (W * 0.02);
+                        const dy = Math.sin(ang) * (H * 0.02);
+                        const ox = cx - baseW/2 + dx;
+                        const oy = cy - baseH/2 + dy;
+                        ctx.globalCompositeOperation = 'lighter';
+                        ctx.lineWidth = Math.max(1, 2 * dpr);
+                        ctx.strokeStyle = color;
+                        ctx.globalAlpha = 0.18;
+                        roundRectPath(ctx, ox, oy, baseW, baseH, radius);
+                        ctx.stroke();
+                    }
+
+                    // Soft radial bloom
+                    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W,H)/2);
+                    grd.addColorStop(0, 'rgba(255,255,255,0.10)');
+                    grd.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.globalAlpha = 0.4;
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.fillStyle = grd;
+                    ctx.fillRect(0,0,W,H);
+
+                    raf = requestAnimationFrame(animate);
+                };
+
+                if (level >= 4 && !prefersReducedMotion) {
+                    raf = requestAnimationFrame(animate);
+                }
+
+                glitchAnimRef.current = raf;
+                window.addEventListener('resize', resize);
+                return () => {
+                    window.removeEventListener('resize', resize);
+                    if (glitchAnimRef.current) cancelAnimationFrame(glitchAnimRef.current);
+                    glitchAnimRef.current = null;
+                    const ctx2 = canvas.getContext('2d');
+                    ctx2 && ctx2.clearRect(0,0,canvas.width, canvas.height);
+                };
+            }, [currentReading, glitchChain, prefersReducedMotion]);
 
             const drawFateCard = () => {
                 if (isDrawing) return;
@@ -549,13 +761,22 @@ const { createFateCore } = window.FortuneCore;
                                     <div
                                         className={`card-holder card-reel ${buildGlitchClass(currentReading)} animate-cardFromDeck ${
                                             SUIT_FONT_CLASS[currentReading.suit] || ''
-                                        }`}
-                                        style={{ '--card-color-flash': getSuitMeta(currentReading.suit).flash }}
+                                        } cursor-pointer`}
+                                        style={{
+                                            '--card-color-flash': getSuitMeta(currentReading.suit).flash,
+                                            '--g-intensity': Math.min(4, Math.max(0, glitchChain || 0)),
+                                        }}
                                         data-suit={currentReading.suit}
+                                        data-glitch-level={currentReading.glitch ? Math.min(6, Math.max(1, glitchChain || 1)) : 0}
+                                        role="button"
+                                        aria-label="Erneut ziehen"
+                                        title="Erneut ziehen"
+                                        onClick={() => { if (!isDrawing) drawFateCard(); }}
                                     >
                                         {currentReading.glitch && glitchChain > 0 && (
                                             <div className="chain-chip">KETTE x{glitchChain}</div>
                                         )}
+                                        {currentReading.glitch && <GlitchBadge />}
                                         {SUIT_IMAGES[currentReading.suit] && !imageError ? (
                                             <img
                                                 src={SUIT_IMAGES[currentReading.suit]}
@@ -571,12 +792,15 @@ const { createFateCore } = window.FortuneCore;
                                             </div>
                                         )}
                                         {(currentReading.suit === 'schelm' || currentReading.suit === 'stern') && <BonusBadge />}
+                                        <canvas ref={glitchCanvasRef} className="glitch-canvas" aria-hidden="true" />
+                                        <div className="glitch-overlay" aria-hidden="true"></div>
                                         <div className="foil-shine" aria-hidden="true"></div>
                                         <div className="edge-highlight" aria-hidden="true"></div>
                                         <div className="inner-shadow" aria-hidden="true"></div>
                                     </div>
                                     <h3 className="text-2xl font-bold text-white mt-4">{currentReading.archetype}</h3>
                                     <p className="text-white/90 font-medium">{currentReading.name} • {currentReading.element}</p>
+                                    {currentReading.glitch && <GlitchProgress value={glitchChain} />}
                                     {glitchChain > 0 && <ChainMeter value={glitchChain} />}
                                     {showInterpretation && (
                                         <div className={currentReading.glitch ? 'interpretation-glitch' : 'animate-fadeIn'}>
