@@ -108,7 +108,7 @@ function hexToRgba(hex, a) {
 }
 ```
 
-**Impact:** Eliminates repeated regex parsing and string parsing, ~80% faster for repeated colors.
+**Impact:** Eliminates repeated regex and string parsing, ~80% faster for repeated colors.
 
 ### 6. Early Exits for Reduced Motion
 
