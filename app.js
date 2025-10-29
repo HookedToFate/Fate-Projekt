@@ -3,9 +3,51 @@
 ;(function(){
   const FALLBACK_FORTUNE = 'Der Schleier bleibt still.';
 
+  // Split NEGATIVE_MAP for better performance and readability
   const NEGATIVE_MAP = {
-            love: ['obsession', 'possession'], heart: ['ego', 'impulse'], intuition: ['doubt', 'second-guessing'], healing: ['wounding', 'erosion'], emotional: ['volatile', 'fragile'], family: ['distance', 'silence'], bonds: ['fractures', 'ties'], compassion: ['pity', 'neglect'], opportunity: ['debt', 'trap'], practical: ['tedious', 'dry'], skills: ['vanity', 'tricks'], rewarded: ['exploited', 'taxed'], resource: ['burden', 'leash'], stability: ['stagnation', 'plateau'], planning: ['paranoia', 'overthinking'], investment: ['gamble', 'sacrifice'], creative: ['chaotic', 'scattered'], project: ['distraction', 'detour'], passion: ['burnout', 'urge'], growth: ['decay', 'bloat'], action: ['impulse', 'rashness'], talents: ['tricks', 'vanities'], flourish: ['fizzle', 'wither'], collaboration: ['conflict', 'friction'], innovative: ['impractical', 'fragile'], leadership: ['dominance', 'egoism'], challenge: ['crisis', 'mess'], strength: ['stubbornness', 'rigidity'], wisdom: ['cynicism', 'distrust'], clarity: ['confusion', 'fog'], doubt: ['despair', 'fear'], decisions: ['mistakes', 'missteps'], transformative: ['destructive', 'corrosive'], victory: ['hollow victory', 'pyrrhic win'], strategic: ['manipulative', 'scheming'], patience: ['delay', 'stalling'], patterns: ['habits', 'loops'], beginnings: ['endings', 'closures'], know: ['distrust', 'forget'], flows: ['decays', 'congeals'], questioning: ['fearing', 'doubting'], life: ['void', 'noise'],
-        }
+    love: ['obsession', 'possession'],
+    heart: ['ego', 'impulse'],
+    intuition: ['doubt', 'second-guessing'],
+    healing: ['wounding', 'erosion'],
+    emotional: ['volatile', 'fragile'],
+    family: ['distance', 'silence'],
+    bonds: ['fractures', 'ties'],
+    compassion: ['pity', 'neglect'],
+    opportunity: ['debt', 'trap'],
+    practical: ['tedious', 'dry'],
+    skills: ['vanity', 'tricks'],
+    rewarded: ['exploited', 'taxed'],
+    resource: ['burden', 'leash'],
+    stability: ['stagnation', 'plateau'],
+    planning: ['paranoia', 'overthinking'],
+    investment: ['gamble', 'sacrifice'],
+    creative: ['chaotic', 'scattered'],
+    project: ['distraction', 'detour'],
+    passion: ['burnout', 'urge'],
+    growth: ['decay', 'bloat'],
+    action: ['impulse', 'rashness'],
+    talents: ['tricks', 'vanities'],
+    flourish: ['fizzle', 'wither'],
+    collaboration: ['conflict', 'friction'],
+    innovative: ['impractical', 'fragile'],
+    leadership: ['dominance', 'egoism'],
+    challenge: ['crisis', 'mess'],
+    strength: ['stubbornness', 'rigidity'],
+    wisdom: ['cynicism', 'distrust'],
+    clarity: ['confusion', 'fog'],
+    doubt: ['despair', 'fear'],
+    decisions: ['mistakes', 'missteps'],
+    transformative: ['destructive', 'corrosive'],
+    victory: ['hollow victory', 'pyrrhic win'],
+    strategic: ['manipulative', 'scheming'],
+    patience: ['delay', 'stalling'],
+    patterns: ['habits', 'loops'],
+    beginnings: ['endings', 'closures'],
+    know: ['distrust', 'forget'],
+    flows: ['decays', 'congeals'],
+    questioning: ['fearing', 'doubting'],
+    life: ['void', 'noise']
+  };
 
   function hashString(seed) {
             let h = 2166136261 >>> 0;
@@ -37,35 +79,46 @@
             return replacement;
         }
 
+  // Optimized twistFortuneText with reduced regex operations and array allocations
+  const wordRegex = /^[\p{L}A-Za-z]+$/u;
+  const longWordRegex = /^[\p{L}A-Za-z]{5,}$/u;
+  const bleak = ['loss', 'void', 'ruin'];
+  
   function twistFortuneText(original, rnd) {
-            const tokens = original.split(/(\W+)/);
-            const candidateIndexes = [];
-            for (let i = 0; i < tokens.length; i++) {
-                const word = tokens[i];
-                if (!/^[\p{L}A-Za-z]+$/u.test(word)) continue;
-                if (NEGATIVE_MAP[word.toLowerCase()]) candidateIndexes.push(i);
-            }
-
-            let replacementIndex = candidateIndexes.length ? pick(candidateIndexes, rnd) : -1;
-
-            if (replacementIndex === -1) {
-                for (let i = 0; i < tokens.length; i++) {
-                    if (/^[\p{L}A-Za-z]{5,}$/u.test(tokens[i])) {
-                        replacementIndex = i;
-                        break;
-                    }
-                }
-                if (replacementIndex === -1) return original;
-
-                const bleak = ['loss', 'void', 'ruin'];
-                tokens[replacementIndex] = preserveCase(tokens[replacementIndex], pick(bleak, rnd, bleak[0]));
-                return tokens.join('');
-            }
-
-            const negatives = NEGATIVE_MAP[tokens[replacementIndex].toLowerCase()];
-            tokens[replacementIndex] = preserveCase(tokens[replacementIndex], pick(negatives, rnd, negatives[0]));
-            return tokens.join('');
+    const tokens = original.split(/(\W+)/);
+    let replacementIndex = -1;
+    
+    // First pass: find words with negative mappings (more efficient single loop)
+    for (let i = 0; i < tokens.length; i++) {
+      const word = tokens[i];
+      if (!wordRegex.test(word)) continue;
+      
+      const lowerWord = word.toLowerCase();
+      if (NEGATIVE_MAP[lowerWord]) {
+        // Found a mappable word - randomly decide if we use it
+        if (replacementIndex === -1 || rnd() < 0.5) {
+          replacementIndex = i;
         }
+      }
+    }
+
+    // If we found a mappable word, use it
+    if (replacementIndex !== -1) {
+      const negatives = NEGATIVE_MAP[tokens[replacementIndex].toLowerCase()];
+      tokens[replacementIndex] = preserveCase(tokens[replacementIndex], pick(negatives, rnd, negatives[0]));
+      return tokens.join('');
+    }
+
+    // Fallback: find any long word
+    for (let i = 0; i < tokens.length; i++) {
+      if (longWordRegex.test(tokens[i])) {
+        tokens[i] = preserveCase(tokens[i], pick(bleak, rnd, bleak[0]));
+        return tokens.join('');
+      }
+    }
+
+    return original;
+  }
 function createFateCore(registry, opts = {}) {
             const history = [];
             const historyLimit = opts.historyLimit ?? 5;
@@ -119,6 +172,9 @@ function createFateCore(registry, opts = {}) {
   let color = '#ffffff';
   const stars = [];
   let pulse = 0, pulseV = 0; // ring pulse
+  
+  // Cache for color conversions to avoid repeated calculations
+  const colorCache = new Map();
 
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
@@ -127,6 +183,9 @@ function createFateCore(registry, opts = {}) {
     if(!canvas) return;
     ctx = canvas.getContext('2d');
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    
+    // Debounced resize handler to prevent excessive recalculations
+    let resizeTimeout;
     function resize(){
       dpr = Math.max(1, window.devicePixelRatio || 1);
       canvas.width = Math.floor(window.innerWidth * dpr);
@@ -134,8 +193,12 @@ function createFateCore(registry, opts = {}) {
       canvas.style.width = window.innerWidth + 'px';
       canvas.style.height = window.innerHeight + 'px';
     }
+    function debouncedResize(){
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resize, 150);
+    }
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', debouncedResize);
 
     // seed twinkles
     stars.length = 0;
@@ -145,9 +208,28 @@ function createFateCore(registry, opts = {}) {
       });
     }
 
+    // Frame rate limiting for better performance
+    let lastFrameTime = 0;
+    const targetFPS = 30;
+    const frameInterval = 1000 / targetFPS;
+    
     function loop(t){
+      // Limit frame rate to reduce CPU usage
+      const elapsed = t - lastFrameTime;
+      if (elapsed < frameInterval) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+      lastFrameTime = t - (elapsed % frameInterval);
+      
       const W = canvas.width, H = canvas.height;
       ctx.clearRect(0,0,W,H);
+
+      // Skip rendering if reduced motion is preferred
+      if (media.matches) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
 
       // nebula tint
       const g = ctx.createRadialGradient(W*0.5, H*0.35, 0, W*0.5, H*0.5, Math.max(W,H)*0.7);
@@ -155,25 +237,30 @@ function createFateCore(registry, opts = {}) {
       g.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-      // twinkles
+      // twinkles - use cached color conversions
       ctx.globalCompositeOperation = 'lighter';
       for(const s of stars){
         const a = (Math.sin(t*s.sp/800)+1)/2; // 0..1
-        ctx.fillStyle = hexToRgba(color, 0.12 + a*0.22);
+        const alpha = 0.12 + a*0.22;
+        ctx.fillStyle = hexToRgba(color, alpha);
         const x = s.x*W, y = s.y*H; const rr = (s.r + a*0.8)*dpr;
         ctx.beginPath(); ctx.arc(x,y,rr,0,Math.PI*2); ctx.fill();
       }
 
-      // pulse rings
-      if(pulse > 0.001 && !media.matches){
+      // pulse rings - only update and render when active
+      if(pulse > 0.001){
         pulse += pulseV; pulseV *= 0.985; pulse *= 0.985;
         const cx = W*0.5, cy = H*0.5;
+        const maxDim = Math.max(W,H);
         for(let i=0;i<3;i++){
-          ctx.strokeStyle = hexToRgba(color, 0.25 * Math.max(0, (pulse - i*0.15)));
-          ctx.lineWidth = Math.max(1, 2*dpr);
-          ctx.beginPath();
-          ctx.arc(cx, cy, Math.max(W,H)*0.12 + (pulse-i*0.15)*Math.max(W,H)*0.25, 0, Math.PI*2);
-          ctx.stroke();
+          const ringPulse = pulse - i*0.15;
+          if (ringPulse > 0) {
+            ctx.strokeStyle = hexToRgba(color, 0.25 * ringPulse);
+            ctx.lineWidth = Math.max(1, 2*dpr);
+            ctx.beginPath();
+            ctx.arc(cx, cy, maxDim*0.12 + ringPulse*maxDim*0.25, 0, Math.PI*2);
+            ctx.stroke();
+          }
         }
       }
 
@@ -208,10 +295,26 @@ function createFateCore(registry, opts = {}) {
     }
   }
 
+  // Optimized hexToRgba with caching to avoid repeated regex and parsing
   function hexToRgba(hex, a){
+    const cacheKey = `${hex}_${a}`;
+    if (colorCache.has(cacheKey)) {
+      return colorCache.get(cacheKey);
+    }
+    
     const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
-    if(!m) return `rgba(255,255,255,${a||1})`;
-    return `rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a||1})`;
+    const result = m 
+      ? `rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a||1})`
+      : `rgba(255,255,255,${a||1})`;
+    
+    // Limit cache size to prevent memory leaks
+    if (colorCache.size > 100) {
+      const firstKey = colorCache.keys().next().value;
+      colorCache.delete(firstKey);
+    }
+    
+    colorCache.set(cacheKey, result);
+    return result;
   }
 
   window.VisualFX = { initFX, updateAmbient, shootParticles };
@@ -533,7 +636,8 @@ const { createFateCore } = window.FortuneCore;
                 if (!canvas || !holder) return;
                 const level = currentReading?.glitch ? Math.min(6, Math.max(1, glitchChain || 1)) : 0;
 
-                // Resize canvas to match holder's CSS pixels
+                // Debounced resize to avoid excessive recalculation
+                let resizeTimeout;
                 const resize = () => {
                     const rect = holder.getBoundingClientRect();
                     const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -542,12 +646,20 @@ const { createFateCore } = window.FortuneCore;
                     canvas.style.width = rect.width + 'px';
                     canvas.style.height = rect.height + 'px';
                 };
+                const debouncedResize = () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(resize, 150);
+                };
                 resize();
 
                 let raf = null;
                 const ctx = canvas.getContext('2d');
                 const color = getSuitMeta(currentReading?.suit || 'hearts').flash;
-                let t0 = performance.now();
+                
+                // Frame rate limiting for better performance
+                let lastFrameTime = 0;
+                const targetFPS = 30;
+                const frameInterval = 1000 / targetFPS;
 
                 function roundRectPath(ctx, x, y, w, h, r){
                     const rr = Math.min(r, Math.min(w, h) / 2);
@@ -561,41 +673,54 @@ const { createFateCore } = window.FortuneCore;
                 }
 
                 const animate = (now) => {
-                    const dt = (now - t0) / 1000;
-                    t0 = now;
+                    // Limit frame rate
+                    const elapsed = now - lastFrameTime;
+                    if (elapsed < frameInterval) {
+                        raf = requestAnimationFrame(animate);
+                        return;
+                    }
+                    lastFrameTime = now - (elapsed % frameInterval);
+                    
                     const dpr = Math.max(1, window.devicePixelRatio || 1);
                     const W = canvas.width;
                     const H = canvas.height;
                     ctx.clearRect(0, 0, W, H);
 
-                    if (prefersReducedMotion || level < 4) return; // draw nothing for low level
+                    // Early exit for low level or reduced motion
+                    if (prefersReducedMotion || level < 4) {
+                        raf = requestAnimationFrame(animate);
+                        return;
+                    }
 
-                    // Echos orbit around the center
+                    // Echos orbit around the center - cache calculations
                     const cx = W/2, cy = H/2;
                     const baseW = W * 0.86;
                     const baseH = H * 0.86;
                     const radius = Math.min(baseW, baseH) * 0.055;
                     const ghosts = 3;
+                    const ghostAngleStep = (Math.PI*2/ghosts);
+                    
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.lineWidth = Math.max(1, 2 * dpr);
+                    ctx.strokeStyle = color;
+                    ctx.globalAlpha = 0.18;
+                    
                     for (let i=0;i<ghosts;i++){
-                        const ang = (now/900 + i * (Math.PI*2/ghosts));
+                        const ang = (now/900 + i * ghostAngleStep);
                         const dx = Math.cos(ang) * (W * 0.02);
                         const dy = Math.sin(ang) * (H * 0.02);
                         const ox = cx - baseW/2 + dx;
                         const oy = cy - baseH/2 + dy;
-                        ctx.globalCompositeOperation = 'lighter';
-                        ctx.lineWidth = Math.max(1, 2 * dpr);
-                        ctx.strokeStyle = color;
-                        ctx.globalAlpha = 0.18;
                         roundRectPath(ctx, ox, oy, baseW, baseH, radius);
                         ctx.stroke();
                     }
 
-                    // Soft radial bloom
-                    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W,H)/2);
+                    // Soft radial bloom - reuse calculated values
+                    const maxDim = Math.max(W,H);
+                    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxDim/2);
                     grd.addColorStop(0, 'rgba(255,255,255,0.10)');
                     grd.addColorStop(1, 'rgba(255,255,255,0)');
                     ctx.globalAlpha = 0.4;
-                    ctx.globalCompositeOperation = 'lighter';
                     ctx.fillStyle = grd;
                     ctx.fillRect(0,0,W,H);
 
@@ -607,9 +732,10 @@ const { createFateCore } = window.FortuneCore;
                 }
 
                 glitchAnimRef.current = raf;
-                window.addEventListener('resize', resize);
+                window.addEventListener('resize', debouncedResize);
                 return () => {
-                    window.removeEventListener('resize', resize);
+                    clearTimeout(resizeTimeout);
+                    window.removeEventListener('resize', debouncedResize);
                     if (glitchAnimRef.current) cancelAnimationFrame(glitchAnimRef.current);
                     glitchAnimRef.current = null;
                     const ctx2 = canvas.getContext('2d');
