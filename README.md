@@ -1021,4 +1021,3 @@ Dieses Repository enthält umfassende Anweisungen für GitHub Copilot Coding Age
 - Häufige Fallstricke und KI-spezifische Hinweise
 
 ---
-Bitte jetzt erstellen der webseite/html etc.
