@@ -1,6 +1,9 @@
 # Fate-Orakel
 Karten Zieh Artefakt - Stand 21.10.2025
 
+> Masterclass: Für eine vollständige, design‑ und entwicklungsnahe Beschreibung der Erscheinung, Interaktionen und Effekte siehe
+> `docs/Fate-Orakel-Masterclass.md`.
+
 # Vollständige Beschreibung des Fate-Orakels 
 
 ## Grundkonzept und Thema
