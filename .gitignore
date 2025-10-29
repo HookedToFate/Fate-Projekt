@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+*.bak
+*.original
+*.min.html
+*.min.css
+*.min.js
+
+# Test results
+test-results/
+playwright-report/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+/tmp/
