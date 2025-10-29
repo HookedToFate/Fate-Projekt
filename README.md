@@ -398,6 +398,19 @@ Wenn man darauf klickt, öffnet sich ein Panel von rechts oben:
 
 ### Journal-Panel
 - Ein halbtransparentes Overlay mit dunklem Hintergrund und Glasmorphismus
+
+---
+
+## Onboarding für Contributors & Coding Agents
+
+Kurz: Für Hinweise zum Arbeiten mit automatisierten Coding Agents (z. B. GitHub Copilot Coding Agent)
+und für repository‑spezifische Regeln, siehe die Dateien im Verzeichnis `.github/`:
+
+- `.github/copilot-instructions.md` – ausführliche, repository‑weite Anweisungen für Copilot
+- `.github/copilot-assistant.yml` – kompakte Agentenkonfiguration (maschinell lesbar)
+- `.github/ONBOARDING_COPILOT.md` – praktisches Kurz‑Onboarding und PR‑Checklist
+
+Bitte lese diese Dateien bevor du Änderungen vorschlägst oder einen PR öffnest.
 - Breite: 340px
 - Position: Oben rechts, fixiert
 
@@ -996,4 +1009,28 @@ Das Glitch-System unterscheidet bereits zwischen "normal" und "blitz":
 Dies vervollständigt die detaillierte Beschreibung des Fate-Orakels. Die Anwendung ist ein komplexes Zusammenspiel aus mystischer Ästhetik, technischen Animationen, semantischer Text-Verarbeitung und spielerischen Interaktionselementen – alles darauf ausgelegt, ein immersives, fast magisches Erlebnis zu schaffen.
 
 ---
-Bitte jetzt erstellen der webseite/html etc.
+
+## Entwicklung und Beiträge
+
+### Für Entwickler
+
+Wenn Sie zu diesem Projekt beitragen möchten, lesen Sie bitte die [CONTRIBUTING.md](CONTRIBUTING.md) für detaillierte Richtlinien.
+
+**Schnellstart:**
+```bash
+npm install           # Abhängigkeiten installieren
+npm start            # Entwicklungsserver starten
+npm test             # Tests ausführen
+```
+
+### Für GitHub Copilot
+
+Dieses Repository enthält umfassende Anweisungen für GitHub Copilot Coding Agent unter [`.github/copilot-instructions.md`](.github/copilot-instructions.md). Diese Datei enthält:
+
+- Vollständige Projektübersicht und Architektur
+- Technologie-Stack und Abhängigkeiten
+- Programmierkonventionen und Richtlinien
+- Test-Strategien und Entwicklungsworkflow
+- Häufige Fallstricke und KI-spezifische Hinweise
+
+---

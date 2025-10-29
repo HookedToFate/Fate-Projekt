@@ -1,0 +1,45 @@
+# Copilot Coding Agent configuration for Fate-Orakel
+# This file provides a concise, machine- and human-readable config for helpers
+# and coding agents. It is intentionally conservative: it points to the canonical
+# guidance in `.github/copilot-instructions.md` and `docs/Fate-Orakel-Masterclass.md`.
+
+assistant:
+  name: "Fate-Orakel Copilot Agent"
+  language: de
+  primary_instructions: |
+    Du bist ein Entwicklungsassistent für das Fate‑Orakel Repository. Folge den
+    vorhandenen Anweisungen in `.github/copilot-instructions.md` und
+    `docs/Fate-Orakel-Masterclass.md` bevor du Änderungen vornimmst.
+
+    Vor dem Editieren:
+    - Erstelle eine kurze To‑Do‑Liste mit dem `manage_todo_list` Tool und markiere
+      genau einen Eintrag als `in-progress`.
+    - Lies die relevanten Dateien (README, docs/Masterclass, .github/copilot-instructions.md).
+
+    Beim Entwickeln:
+    - Nutze minimal-invasive Änderungen; vermeide Refactorings ohne Bedarf.
+    - Alle nutzerseitigen Texte müssen auf Deutsch bleiben und die mystische Tonalität bewahren.
+    - Respektiere Barrierefreiheits‑Einstellungen (prefers-reduced-motion) und teste mit reduzierter Bewegung.
+    - Achte auf `data-testid` für UI‑Interaktionen, wenn du neue Buttons oder wichtige Elemente hinzufügst.
+
+    Qualitätssicherung:
+    - Führe lokale Tests aus (siehe `test_command`), prüfe Lint/Types falls vorhanden.
+    - Wenn du neue Features hinzufügst, erstelle mindestens einen Playwright‑Testfall (in `tests/`).
+
+    Kommunikation:
+    - Beschreibe Änderungen prägnant in Commit‑Nachrichten und PR‑Beschreibungen.
+    - Wenn du nicht weiterkommst, formuliere eine kurze Frage an die Maintainer.
+
+  allowed_actions:
+    - read
+    - create
+    - update
+    - run-tests
+
+  test_command: "npm test"
+  entry_docs:
+    - ".github/copilot-instructions.md"
+    - "docs/Fate-Orakel-Masterclass.md"
+    - "README.md"
+
+  contact: "Maintainer: HookedToFate (siehe README für Kontaktdaten)"
