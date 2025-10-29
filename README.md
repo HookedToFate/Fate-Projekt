@@ -996,4 +996,29 @@ Das Glitch-System unterscheidet bereits zwischen "normal" und "blitz":
 Dies vervollständigt die detaillierte Beschreibung des Fate-Orakels. Die Anwendung ist ein komplexes Zusammenspiel aus mystischer Ästhetik, technischen Animationen, semantischer Text-Verarbeitung und spielerischen Interaktionselementen – alles darauf ausgelegt, ein immersives, fast magisches Erlebnis zu schaffen.
 
 ---
+
+## Entwicklung und Beiträge
+
+### Für Entwickler
+
+Wenn Sie zu diesem Projekt beitragen möchten, lesen Sie bitte die [CONTRIBUTING.md](CONTRIBUTING.md) für detaillierte Richtlinien.
+
+**Schnellstart:**
+```bash
+npm install           # Abhängigkeiten installieren
+npm start            # Entwicklungsserver starten
+npm test             # Tests ausführen
+```
+
+### Für GitHub Copilot
+
+Dieses Repository enthält umfassende Anweisungen für GitHub Copilot Coding Agent unter [`.github/copilot-instructions.md`](.github/copilot-instructions.md). Diese Datei enthält:
+
+- Vollständige Projektübersicht und Architektur
+- Technologie-Stack und Abhängigkeiten
+- Programmierkonventionen und Richtlinien
+- Test-Strategien und Entwicklungsworkflow
+- Häufige Fallstricke und KI-spezifische Hinweise
+
+---
 Bitte jetzt erstellen der webseite/html etc.
