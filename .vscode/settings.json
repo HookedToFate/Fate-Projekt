@@ -1,5 +1,5 @@
 {
-    "liveServer.settings.port": 5501,
+    "liveServer.settings.port": 5502,
     "chat.tools.terminal.autoApprove": {
         "autoApprove": true,
         "cd": true,
@@ -101,5 +101,8 @@
         "eval": false,
         "Invoke-Expression": false,
         "iex": false
-    }
+    },
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
 }

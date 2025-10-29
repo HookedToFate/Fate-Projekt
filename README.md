@@ -398,6 +398,19 @@ Wenn man darauf klickt, öffnet sich ein Panel von rechts oben:
 
 ### Journal-Panel
 - Ein halbtransparentes Overlay mit dunklem Hintergrund und Glasmorphismus
+
+---
+
+## Onboarding für Contributors & Coding Agents
+
+Kurz: Für Hinweise zum Arbeiten mit automatisierten Coding Agents (z. B. GitHub Copilot Coding Agent)
+und für repository‑spezifische Regeln, siehe die Dateien im Verzeichnis `.github/`:
+
+- `.github/copilot-instructions.md` – ausführliche, repository‑weite Anweisungen für Copilot
+- `.github/copilot-assistant.yml` – kompakte Agentenkonfiguration (maschinell lesbar)
+- `.github/ONBOARDING_COPILOT.md` – praktisches Kurz‑Onboarding und PR‑Checklist
+
+Bitte lese diese Dateien bevor du Änderungen vorschlägst oder einen PR öffnest.
 - Breite: 340px
 - Position: Oben rechts, fixiert
 
