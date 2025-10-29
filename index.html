@@ -6,8 +6,8 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Fate Orakel ✨</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -17,7 +17,13 @@
 <canvas aria-hidden="true" id="veil-bg"></canvas>
 <div id="root"></div>
 
-
 <script src="app.js" type="text/babel"></script>
+    ),
+    document.getElementById('root')
+  );
+</script>
+
+
+<script src="app.js" type="text/babel" data-type="module"></script>
 </body>
 </html>
