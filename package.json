@@ -2,13 +2,23 @@
   "name": "fate-orakel",
   "private": true,
   "version": "0.0.0",
-  "devDependencies": {
-    "@playwright/test": "^1.48.0"
-  },
   "scripts": {
+    "start": "npx serve . --config serve.json",
     "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed"
+    "optimize:images": "for img in *.png; do pngquant --quality=90-98 --force --ext .png \"$img\" && optipng -o2 -preserve \"$img\"; done",
+    "optimize:css": "csso styles.css.original -o styles.css",
+    "optimize:html": "html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js false index.html.original -o index.html",
+    "optimize": "npm run optimize:images && npm run optimize:css && npm run optimize:html"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "serve": "^14.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "csso-cli": "^4.0.2",
+    "html-minifier-terser": "^7.2.0",
+    "terser": "^5.44.0"
   }
 }
-

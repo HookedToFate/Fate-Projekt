@@ -445,6 +445,8 @@ const { createFateCore } = window.FortuneCore;
             const fireworkTimeoutRef = useRef(null);
             const drawTimeoutRef = useRef(null);
             const showInterpretationTimeoutRef = useRef(null);
+            const glitchCanvasRef = useRef(null);
+            const glitchAnimRef = useRef(null);
 
             const core = useMemo(() => createFateCore(SUIT_REGISTRY), []);
 
